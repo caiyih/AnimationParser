@@ -1,0 +1,158 @@
+using System.Net.Security;
+
+namespace AnimationParser.Core;
+
+public class TokenFactory
+{
+    public TokenPosition CurrentPosition { get; protected set; }
+
+    public int CurrentSourceIndex { get; protected set; }
+
+    public string SourceDocument { get; protected set; }
+
+    public TokenFactory(string sourceDocument)
+    {
+        CurrentSourceIndex = 0;
+        SourceDocument = sourceDocument;
+        startPosition = CurrentPosition = new TokenPosition
+        {
+            LineNo = 1,
+            CharNo = 1,
+        };
+    }
+
+    private TokenPosition startPosition;
+
+    public void MoveNext()
+    {
+        CurrentPosition = new TokenPosition
+        {
+            LineNo = CurrentPosition.LineNo,
+            CharNo = CurrentPosition.CharNo + 1,
+        };
+        CurrentSourceIndex++;
+
+        // if (startPosition.LineNo == 1 && startPosition.CharNo == 1)
+        // {
+        //     startPosition = CurrentPosition;
+        // }
+    }
+
+    public void OnNewLine()
+    {
+        CurrentPosition = new TokenPosition
+        {
+            LineNo = CurrentPosition.LineNo + 1,
+            CharNo = 0,
+        };
+    }
+
+    protected int GetTokenStartIndex(int length)
+    {
+        if (CurrentSourceIndex == 0)
+        {
+            return 0;
+        }
+
+        return CurrentSourceIndex - length;
+    }
+
+    public virtual Token LeftParen
+    {
+        get
+        {
+            Token token = new(SourceDocument)
+            {
+                Type = TokenType.LeftParen,
+                Position = startPosition,
+                SourceIndex = GetTokenStartIndex(1),
+                Length = 1,
+            };
+
+            startPosition = CurrentPosition;
+
+            return token;
+        }
+    }
+
+    public virtual Token RightParen
+    {
+        get
+        {
+            Token token = new(SourceDocument)
+            {
+                Type = TokenType.RightParen,
+                Position = startPosition,
+                SourceIndex = GetTokenStartIndex(1),
+                Length = 1
+            };
+
+            startPosition = CurrentPosition;
+
+            return token;
+        }
+    }
+
+    public virtual Token EndOfSource
+    {
+        get
+        {
+            Token token = new(SourceDocument)
+            {
+                Type = TokenType.EndOfSource,
+                Position = startPosition,
+                SourceIndex = GetTokenStartIndex(0),
+                Length = 0
+            };
+
+            startPosition = CurrentPosition;
+
+            return token;
+        }
+    }
+
+    public virtual Token Keyword(int length)
+    {
+        Token token = new(SourceDocument)
+        {
+            Type = TokenType.Keyword,
+            Position = startPosition,
+            SourceIndex = GetTokenStartIndex(length),
+            Length = length
+        };
+
+        startPosition = CurrentPosition;
+
+        return token;
+    }
+
+    public virtual Token Identifier(int length)
+    {
+        Token token = new(SourceDocument)
+        {
+            Type = TokenType.Identifier,
+            Position = startPosition,
+            SourceIndex = GetTokenStartIndex(length),
+            Length = length
+        };
+
+        startPosition = CurrentPosition;
+
+        return token;
+    }
+
+    public virtual Token Number(int length)
+    {
+        Token token = new(SourceDocument)
+        {
+            Type = TokenType.Number,
+            Position = startPosition,
+            SourceIndex = GetTokenStartIndex(length),
+            Length = length
+        };
+
+        startPosition = CurrentPosition;
+
+        return token;
+    }
+}
