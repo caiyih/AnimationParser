@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Collections.Immutable;
 
 namespace AnimationParser.Core;
@@ -18,6 +19,7 @@ public class Lexer
         tokenFactory = new TokenFactory(input);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private void MoveNext()
     {
         tokenFactory.MoveNext();
@@ -68,6 +70,7 @@ public class Lexer
         yield return tokenFactory.EndOfSource;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private Token ReadKeywordOrIdentifier()
     {
         int start = CurrentSourceIndex;
@@ -83,6 +86,7 @@ public class Lexer
         };
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private Token ReadNumber()
     {
         int start = CurrentSourceIndex;
@@ -92,6 +96,7 @@ public class Lexer
         return tokenFactory.Number(CurrentSourceIndex - start);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private bool IsKeyword(ReadOnlySpan<char> text)
     {
         // Static dispatch to avoid string allocations

@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Net.Security;
 
 namespace AnimationParser.Core;
@@ -23,6 +24,7 @@ public class TokenFactory
 
     private TokenPosition startPosition;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void MoveNext()
     {
         CurrentPosition = new TokenPosition
@@ -38,6 +40,7 @@ public class TokenFactory
         // }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void OnNewLine()
     {
         CurrentPosition = new TokenPosition
@@ -47,6 +50,7 @@ public class TokenFactory
         };
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     protected int GetTokenStartIndex(int length)
     {
         if (CurrentSourceIndex == 0)
@@ -59,6 +63,7 @@ public class TokenFactory
 
     public virtual Token LeftParen
     {
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         get
         {
             Token token = new(SourceDocument)
@@ -77,6 +82,7 @@ public class TokenFactory
 
     public virtual Token RightParen
     {
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         get
         {
             Token token = new(SourceDocument)
@@ -95,6 +101,7 @@ public class TokenFactory
 
     public virtual Token EndOfSource
     {
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         get
         {
             Token token = new(SourceDocument)
@@ -111,6 +118,7 @@ public class TokenFactory
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public virtual Token Keyword(int length)
     {
         Token token = new(SourceDocument)
@@ -126,6 +134,7 @@ public class TokenFactory
         return token;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public virtual Token Identifier(int length)
     {
         Token token = new(SourceDocument)
@@ -141,6 +150,7 @@ public class TokenFactory
         return token;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public virtual Token Number(int length)
     {
         Token token = new(SourceDocument)
