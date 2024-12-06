@@ -32,6 +32,8 @@ public class TestDefineCommand
 
         protected override void OnObjectAdded(string name, AnimationObject value)
         {
+            base.OnObjectAdded(name, value);
+
             if (name == "drawable")
             {
                 IsDrawableAdded = true;

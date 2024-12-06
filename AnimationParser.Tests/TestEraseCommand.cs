@@ -34,6 +34,8 @@ public class TestEraseCommand
 
         protected override void OnObjectErasingOut(string name, AnimationObject drawable)
         {
+            base.OnObjectErasingOut(name, drawable);
+            
             if (name == "drawable")
             {
                 IsErasedExecuted = true;

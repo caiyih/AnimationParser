@@ -33,6 +33,8 @@ public class TestPlaceCommand
 
         protected override void OnObjectPlaced(string name, AnimationObject value, Vector2 position)
         {
+            base.OnObjectPlaced(name, value, position);
+
             if (name == "drawable")
             {
                 newPosition = position;
