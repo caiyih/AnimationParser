@@ -19,8 +19,6 @@ public partial class AnimationContext
             throw new Exception($"Variable '{name}' is already declared");
         }
 
-        _animatedObject[name] = value;
-
         OnObjectAdded(name, value);
     }
 
@@ -48,8 +46,6 @@ public partial class AnimationContext
 
         Debug.Assert(obj != null, "Object should not be null");
 
-        obj.Position = position;
-
         OnObjectPlaced(name, obj, position);
     }
 
@@ -61,20 +57,21 @@ public partial class AnimationContext
         }
 
         OnObjectErasingOut(name, obj);
-
-        _animatedObject.Remove(name);
     }
 
     protected virtual void OnObjectPlaced(string name, AnimationObject obj, Vector2 position)
     {
+        obj.Position = position;
     }
 
     protected virtual void OnObjectAdded(string name, AnimationObject obj)
     {
+        _animatedObject[name] = obj;
     }
 
     protected virtual void OnObjectErasingOut(string name, AnimationObject obj)
     {
+        _animatedObject.Remove(name);
     }
 
     protected virtual void OnObjectShifting(string name, AnimationObject obj, Direction direction)

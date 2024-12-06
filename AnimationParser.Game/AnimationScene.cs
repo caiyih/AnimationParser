@@ -28,6 +28,8 @@ public partial class AnimationScene : Container
 
         protected override void OnObjectAdded(string name, AnimationObject obj)
         {
+            base.OnObjectAdded(name, obj);
+
             // Add a associated binding GameObject to the Game Engine
             var drawable = new Container()
             {
@@ -82,14 +84,6 @@ public partial class AnimationScene : Container
             drawable.FlashColour(Color4.Pink, 800, Easing.OutQuint);
         }
 
-        protected virtual void OnObjectPlaced(string name, AnimationObject obj, Vector2 position)
-        {
-            if (drawables.TryGetValue(name, out var drawable))
-            {
-                drawable.Position = position;
-            }
-        }
-
         protected override void OnObjectErasingOut(string name, AnimationObject obj)
         {
             if (drawables.TryGetValue(name, out var drawable))
@@ -98,12 +92,32 @@ public partial class AnimationScene : Container
                     .OrderDescending()
                     .FirstOrDefault();
 
-                drawable.Delay(delay).Then().FadeOut(duration).Expire();
+                drawable.Delay(delay).Then().FadeOut(duration).Expire()
+                    .OnComplete(_ =>
+                    {
+                        drawables.Remove(name);
+                        base.OnObjectErasingOut(name, obj);
+                    });
+            }
+        }
+
+        protected override void OnObjectPlaced(string name, AnimationObject obj, System.Numerics.Vector2 position)
+        {
+            base.OnObjectPlaced(name, obj, position);
+
+            if (drawables.TryGetValue(name, out var drawable))
+            {
+                var delay = drawable.Transforms.Select(t => t.EndTime - drawable.Time.Current)
+                    .OrderDescending()
+                    .FirstOrDefault();
+
+                drawable.Delay(delay).Then().MoveTo(new Vector2(position.X, position.Y), duration);
             }
         }
 
         protected override void OnObjectShifting(string name, AnimationObject obj, Core.Direction direction)
         {
+            base.OnObjectShifting(name, obj, direction);
             var rect = container.DrawRectangle;
 
             if (drawables.TryGetValue(name, out var drawable))
