@@ -13,20 +13,20 @@ BenchmarkRunner.Run<BenchmarkAnimationParser>();
 //                         (erase cross)
 //                         """;
 //
-//    BenchmarkDotNet v0.14.0, Arch Linux
+//    BenchmarkDotNet v0.14.0, Windows 11 (10.0.22631.4460/23H2/2023Update/SunValley3)
 //    13th Gen Intel Core i5-13500H, 1 CPU, 16 logical and 12 physical cores
-//    .NET SDK 9.0.101
-//    [Host]     : .NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2
-//    DefaultJob : .NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2
+//    .NET SDK 9.0.100-rc.1.24452.12
+//    [Host]     : .NET 9.0.0 (9.0.24.43107), X64 RyuJIT AVX2
+//    DefaultJob : .NET 9.0.0 (9.0.24.43107), X64 RyuJIT AVX2
 //
 //
-//    | Method                     | Mean     | Error     | StdDev    | Gen0   | Allocated |
-//    |--------------------------- |---------:|----------:|----------:|-------:|----------:|
-//    | BenchmarkLexing            | 1.198 us | 0.0011 us | 0.0010 us | 0.0153 |     144 B |
-//    | BenchmarkParsing           | 2.907 us | 0.0063 us | 0.0056 us | 0.2289 |    2184 B |
-//    | BenchmarkLexingToParsing   | 3.566 us | 0.0046 us | 0.0043 us | 0.2403 |    2264 B |
-//    | BenchmarkExecuting         | 2.854 us | 0.0020 us | 0.0016 us | 0.4501 |    4240 B |
-//    | BenchmarkLexingToExecuting | 6.468 us | 0.0163 us | 0.0145 us | 0.6866 |    6504 B |
+//    | Method                     | Mean       | Error    | StdDev   | Gen0   | Allocated |
+//    |--------------------------- |-----------:|---------:|---------:|-------:|----------:|
+//    | BenchmarkLexing            |   751.4 ns |  1.79 ns |  1.67 ns | 0.0153 |     144 B |
+//    | BenchmarkParsing           | 2,200.9 ns |  7.18 ns |  6.72 ns | 0.2289 |    2184 B |
+//    | BenchmarkLexingToParsing   | 2,711.3 ns |  6.80 ns |  6.36 ns | 0.2403 |    2264 B |
+//    | BenchmarkExecuting         | 1,929.3 ns |  7.19 ns |  5.62 ns | 0.4501 |    4240 B |
+//    | BenchmarkLexingToExecuting | 4,976.2 ns | 86.57 ns | 72.29 ns | 0.6866 |    6504 B |
 //
 //    // * Hints *
 //    Outliers
@@ -46,7 +46,7 @@ BenchmarkRunner.Run<BenchmarkAnimationParser>();
 //
 //
 //    // ***** BenchmarkRunner: End *****
-//    Run time: 00:01:46 (106.71 sec), executed benchmarks: 5
+//    Run time: 00:01:32 (92 sec), executed benchmarks: 5
 
 // 2. with code below
 //     const string code = """
@@ -76,20 +76,20 @@ BenchmarkRunner.Run<BenchmarkAnimationParser>();
 //                         (erase cross)
 //                         """;
 
-//    BenchmarkDotNet v0.14.0, Arch Linux
+//    BenchmarkDotNet v0.14.0, Windows 11 (10.0.22631.4460/23H2/2023Update/SunValley3)
 //    13th Gen Intel Core i5-13500H, 1 CPU, 16 logical and 12 physical cores
-//    .NET SDK 9.0.101
-//    [Host]     : .NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2
-//    DefaultJob : .NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2
+//    .NET SDK 9.0.100-rc.1.24452.12
+//    [Host]     : .NET 9.0.0 (9.0.24.43107), X64 RyuJIT AVX2
+//    DefaultJob : .NET 9.0.0 (9.0.24.43107), X64 RyuJIT AVX2
 //
 //
 //    | Method                     | Mean      | Error     | StdDev    | Gen0   | Allocated |
 //    |--------------------------- |----------:|----------:|----------:|-------:|----------:|
-//    | BenchmarkLexing            |  6.803 us | 0.0101 us | 0.0084 us | 0.0153 |     144 B |
-//    | BenchmarkParsing           | 18.321 us | 0.0230 us | 0.0215 us | 1.3123 |   12473 B |
-//    | BenchmarkLexingToParsing   | 21.037 us | 0.0165 us | 0.0147 us | 1.3123 |   12553 B |
-//    | BenchmarkExecuting         | 16.372 us | 0.0284 us | 0.0251 us | 2.5635 |   24240 B |
-//    | BenchmarkLexingToExecuting | 38.014 us | 0.0595 us | 0.0557 us | 3.9063 |   36794 B |
+//    | BenchmarkLexing            |  4.306 us | 0.0163 us | 0.0153 us | 0.0153 |     144 B |
+//    | BenchmarkParsing           | 13.206 us | 0.0441 us | 0.0368 us | 1.3123 |   12473 B |
+//    | BenchmarkLexingToParsing   | 16.313 us | 0.0626 us | 0.0555 us | 1.3123 |   12553 B |
+//    | BenchmarkExecuting         | 11.698 us | 0.0920 us | 0.0718 us | 2.5635 |   24240 B |
+//    | BenchmarkLexingToExecuting | 28.540 us | 0.0714 us | 0.0633 us | 3.9063 |   36794 B |
 //
 //    // * Hints *
 //    Outliers
@@ -109,7 +109,7 @@ BenchmarkRunner.Run<BenchmarkAnimationParser>();
 //
 //
 //    // ***** BenchmarkRunner: End *****
-//    Run time: 00:01:33 (93.92 sec), executed benchmarks: 5
+//    Run time: 00:01:38 (98.74 sec), executed benchmarks: 5
 
 [MemoryDiagnoser]
 public class BenchmarkAnimationParser
@@ -135,7 +135,8 @@ public class BenchmarkAnimationParser
     public void BenchmarkLexing()
     {
         var lexer = new Lexer(code);
-        _ = lexer.Tokenize().All(_ => true); // lexer is lazy evaluated, so we need to consume it
+        var tokenstream = lexer.Tokenize().GetEnumerator();
+        while (tokenstream.MoveNext());
     }
 
     [Benchmark]
