@@ -100,4 +100,47 @@ public static class CommandSequenceExtensions
             }
         }
     }
+
+    /// <summary>
+    /// Interprets the source code into a sequence of commands.
+    /// Ensure that every returned command does not involve implicit multiple commands.
+    /// </summary>
+    /// <param name="source">The source code to interpret.</param>
+    /// <returns>The sequence of commands at the execution order.</returns>
+    public static IEnumerable<IAnimationCommand> InterpretExecutable(this IEnumerable<Token> tokenStream)
+    {
+        var parser = new Parser(tokenStream);
+        return parser.Parse().Flatten();
+    }
+
+    /// <summary>
+    /// Interprets and executes the source code synchronously.
+    /// </summary>
+    /// <param name="tokenStream">The tokenized source code.</param>
+    /// <param name="context">The context to execute the commands.</param>
+    public static void InterprettedlyExecuteAll(this IEnumerable<Token> tokenStream, AnimationContext? context = null)
+    {
+        context ??= new AnimationContext();
+
+        foreach (var command in tokenStream.InterpretExecutable())
+        {
+            command.Execute(context);
+        }
+    }
+
+    /// <summary>
+    /// Interprets and executes the source code asynchronously. Every time a command is executed, it yields the control to the caller.
+    /// </summary>
+    /// <param name="tokenStream">The tokenized source code.</param>
+    /// <param name="context">The context to execute the commands.</param>
+    public static async void InterprettedlyExecuteAllAsync(this IEnumerable<Token> tokenStream, AnimationContext? context = null)
+    {
+        context ??= new AnimationContext();
+
+        foreach (var command in tokenStream.InterpretExecutable())
+        {
+            command.Execute(context);
+            await Task.Yield();
+        }
+    }
 }
