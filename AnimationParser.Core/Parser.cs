@@ -28,6 +28,13 @@ public class Parser
         TokenEnumerator = Tokens.GetEnumerator();
     }
 
+    /// <summary>
+    /// Parses the tokens into a sequence of animation commands. The returned
+    /// sequence is lazy evaluated and faithfully represents the input source.
+    /// To Get the execution sequence, use <see cref="CommandSequenceExtensions.Flatten"/>,
+    /// which flatten the loop commands into a single sequence of commands.
+    /// </summary>
+    /// <returns>A sequence of animation commands faithfully representing the input source</returns>
     public IEnumerable<IAnimationCommand> Parse()
     {
         while (HasToken)
