@@ -165,7 +165,7 @@ public partial class AnimationScene : Container
     {
         Clear();
 
-        foreach (var command in commands)
+        foreach (var command in commands.Flatten())
         {
             command.Execute(context);
         }

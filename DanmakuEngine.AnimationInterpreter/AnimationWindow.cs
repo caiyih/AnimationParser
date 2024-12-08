@@ -173,7 +173,7 @@ public class AnimationWindow : ImguiWindowBase
 
                 context = new ImGuiAnimationContext(this);
 
-                foreach (var statement in parser.Parse())
+                foreach (var statement in parser.Parse().Flatten())
                 {
                     statement.Execute(context);
                 }
