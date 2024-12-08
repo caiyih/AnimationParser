@@ -14,7 +14,7 @@ public static class CommandSequenceExtensions
         /// <summary>
         /// Indicates if the loop has finished.
         /// </summary>
-        public abstract bool Finished { get; }
+        public abstract bool IsFinished { get; }
 
         /// <summary>
         /// Marks the end of an iteration of the loop.
@@ -32,7 +32,7 @@ public static class CommandSequenceExtensions
         {
         }
 
-        public override bool Finished => !FirstIteration;
+        public override bool IsFinished => !FirstIteration;
         private bool FirstIteration { get; set; } = true;
         public override bool OnIterationEnd()
             => FirstIteration = false;
@@ -46,7 +46,7 @@ public static class CommandSequenceExtensions
             RemainingIterations = count;
         }
 
-        public override bool Finished => RemainingIterations <= 0;
+        public override bool IsFinished => RemainingIterations <= 0;
 
         public int RemainingIterations { get; set; }
 
@@ -68,7 +68,7 @@ public static class CommandSequenceExtensions
         {
             Debug.Assert(currentFrame != null);
 
-            if (currentFrame.Finished)
+            if (currentFrame.IsFinished)
             {
                 loopFrames.Pop();
                 continue;
