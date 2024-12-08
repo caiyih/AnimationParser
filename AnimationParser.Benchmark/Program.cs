@@ -138,7 +138,7 @@ public class BenchmarkAnimationParser
     {
         var lexer = new Lexer(code);
         var tokenstream = lexer.Tokenize().GetEnumerator();
-        while (tokenstream.MoveNext());
+        while (tokenstream.MoveNext()) ;
     }
 
     [Benchmark]

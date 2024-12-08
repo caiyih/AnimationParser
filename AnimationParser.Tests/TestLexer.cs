@@ -77,7 +77,7 @@ public class TestLexer
 
         Lexer lexer = new(input);
 
-        Assert.That(() => 
+        Assert.That(() =>
         {
             // Since the lexer is lazy evaluated, we need to enumerate the token stream to trigger the exception
             _ = lexer.Tokenize().All(_ => true);
