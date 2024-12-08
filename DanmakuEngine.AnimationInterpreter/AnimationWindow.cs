@@ -111,8 +111,16 @@ public class AnimationWindow : ImguiWindowBase
 
             IEnumerable<bool> PlaceObject()
             {
-                base.OnObjectPlaced(name, obj, position);
-                yield return true;
+                var start = Time.ElapsedSeconds;
+                var startPosition = obj.Position;
+
+                while (Time.ElapsedSeconds - start < duration)
+                {
+                    obj.Position = startPosition + (position - startPosition) * (float)(Time.ElapsedSeconds - start) / duration;
+                    yield return true;
+                }
+
+                obj.Position = position;
             }
         }
 
@@ -124,22 +132,25 @@ public class AnimationWindow : ImguiWindowBase
             {
                 base.OnObjectShifting(name, drawable, direction);
                 var start = Time.ElapsedSeconds;
+                var startPosition = drawable.Position;
+
+                Vector2 destination = direction switch
+                {
+                    Direction.Up => new Vector2(drawable.Position.X, 0),
+                    Direction.Down => new Vector2(drawable.Position.X, 400),
+                    Direction.Left => new Vector2(0, drawable.Position.Y),
+                    Direction.Right => new Vector2(400, drawable.Position.Y),
+                    _ => throw new NotImplementedException()
+                };
 
                 while (Time.ElapsedSeconds - start < duration)
                 {
-                    Vector2 destination = direction switch
-                    {
-                        Direction.Up => new Vector2(drawable.Position.X, 0),
-                        Direction.Down => new Vector2(drawable.Position.X, 400),
-                        Direction.Left => new Vector2(0, drawable.Position.Y),
-                        Direction.Right => new Vector2(400, drawable.Position.Y),
-                        _ => throw new NotImplementedException()
-                    };
-
-                    var diff = destination - drawable.Position;
-                    drawable.Position += diff * (float)(Time.ElapsedSeconds - start) / duration;
+                    var diff = destination - startPosition;
+                    drawable.Position = startPosition + diff * (float)(Time.ElapsedSeconds - start) / duration;
                     yield return true;
                 }
+
+                drawable.Position = destination;
             }
         }
     }
@@ -203,7 +214,8 @@ public class AnimationWindow : ImguiWindowBase
             // Draw objects
             foreach (var (drawable, info) in context.AnimatedObjects.Select(x => context.GetObject(x.Key)))
             {
-                float alpha = info.Alpha;
+                Vector4 color4 = new Vector4(Vector3.One, info.Alpha);
+                var color = ImGui.GetColorU32(color4);
 
                 // No scaling and rotation factor, we can apply the transformation directly
                 var parentPosition = drawable.Position + windowPos + new Vector2(0, titleBarHeight);
@@ -216,13 +228,13 @@ public class AnimationWindow : ImguiWindowBase
                     {
                         case CircleShape circle:
                             var position = parentPosition + circle.Center;
-                            drawList.AddCircleFilled(position, circle.Radius, ImGui.GetColorU32(new Vector4(1, 1, 1, alpha)));
+                            drawList.AddCircleFilled(position, circle.Radius, color);
                             break;
 
                         case LineShape line:
                             var start = parentPosition + line.Start;
                             var end = parentPosition + line.End;
-                            drawList.AddLine(start, end, ImGui.GetColorU32(new Vector4(1, 1, 1, alpha)));
+                            drawList.AddLine(start, end, color);
                             break;
                     }
                 }
