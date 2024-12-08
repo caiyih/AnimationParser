@@ -138,7 +138,7 @@ public class AnimationWindow : ImguiWindowBase
 
                     var diff = destination - drawable.Position;
                     drawable.Position += diff * (float)(Time.ElapsedSeconds - start) / duration;
-                    yield return true;   
+                    yield return true;
                 }
             }
         }
@@ -197,13 +197,16 @@ public class AnimationWindow : ImguiWindowBase
             finished = !context.MoveNext();
 
             var drawList = ImGui.GetWindowDrawList();
+            var windowPos = ImGui.GetWindowPos();
+            var titleBarHeight = ImGui.GetFrameHeight();
 
             // Draw objects
             foreach (var (drawable, info) in context.AnimatedObjects.Select(x => context.GetObject(x.Key)))
             {
                 float alpha = info.Alpha;
 
-                var parentPosition = drawable.Position;
+                // No scaling and rotation factor, we can apply the transformation directly
+                var parentPosition = drawable.Position + windowPos + new Vector2(0, titleBarHeight);
                 foreach (var shape in drawable.Shapes)
                 {
                     if (shape is null)
