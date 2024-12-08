@@ -1,4 +1,6 @@
 ﻿using AnimationParser.Core;
+using AnimationParser.Core.Commands;
+using AnimationParser.Core.Tokens;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 

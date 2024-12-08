@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using AnimationParser.Core.Commands;
+using AnimationParser.Core.Tokens;
 
 namespace AnimationParser.Core;
 

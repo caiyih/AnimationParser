@@ -1,5 +1,7 @@
 ﻿using System.Numerics;
 using AnimationParser.Core;
+using AnimationParser.Core.Commands;
+using AnimationParser.Core.Shapes;
 
 namespace AnimationParser.Tests;
 

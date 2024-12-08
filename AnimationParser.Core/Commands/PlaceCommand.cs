@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace AnimationParser.Core;
+namespace AnimationParser.Core.Commands;
 
 public class PlaceCommand : IAnimationCommand
 {

@@ -1,5 +1,6 @@
 using System.Numerics;
 using AnimationParser.Core;
+using AnimationParser.Core.Shapes;
 using DanmakuEngine.DearImgui.Windowing;
 using DanmakuEngine.Timing;
 using ImGuiNET;

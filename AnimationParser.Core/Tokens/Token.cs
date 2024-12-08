@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace AnimationParser.Core;
+namespace AnimationParser.Core.Tokens;
 
 public struct Token
 {

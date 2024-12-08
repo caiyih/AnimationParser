@@ -1,4 +1,5 @@
 using System.Numerics;
+using AnimationParser.Core.Shapes;
 
 namespace AnimationParser.Core;
 

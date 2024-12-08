@@ -1,5 +1,8 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using AnimationParser.Core.Commands;
+using AnimationParser.Core.Shapes;
+using AnimationParser.Core.Tokens;
 
 namespace AnimationParser.Core;
 

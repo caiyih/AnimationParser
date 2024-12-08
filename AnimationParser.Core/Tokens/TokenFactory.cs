@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Net.Security;
 
-namespace AnimationParser.Core;
+namespace AnimationParser.Core.Tokens;
 
 public class TokenFactory
 {

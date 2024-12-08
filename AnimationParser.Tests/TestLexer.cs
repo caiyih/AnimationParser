@@ -1,4 +1,5 @@
 using AnimationParser.Core;
+using AnimationParser.Core.Tokens;
 
 namespace AnimationParser.Tests;
 

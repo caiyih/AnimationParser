@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Shapes;
 using System;
 using System.Linq;
 using osuTK.Graphics;
+using AnimationParser.Core.Shapes;
+using AnimationParser.Core.Commands;
 
 namespace AnimationParser.Game;
 

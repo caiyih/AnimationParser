@@ -1,4 +1,4 @@
-namespace AnimationParser.Core;
+namespace AnimationParser.Core.Shapes;
 
 public interface IShape
 {

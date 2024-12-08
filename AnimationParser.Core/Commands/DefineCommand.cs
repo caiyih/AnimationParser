@@ -1,4 +1,4 @@
-namespace AnimationParser.Core;
+namespace AnimationParser.Core.Commands;
 
 public class DefineCommand : IAnimationCommand
 {

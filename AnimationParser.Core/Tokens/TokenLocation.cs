@@ -1,4 +1,4 @@
-namespace AnimationParser.Core;
+namespace AnimationParser.Core.Tokens;
 
 public struct TokenPosition
 {
