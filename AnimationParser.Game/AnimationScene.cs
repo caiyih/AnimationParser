@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using System;
-using System.Linq;
 using osuTK.Graphics;
 using AnimationParser.Core.Shapes;
 using AnimationParser.Core.Commands;
@@ -23,10 +22,10 @@ public partial class AnimationScene : Container
         // In this case, osu!framework. But can be easily to adapt to other engines if you implement this context
         private Dictionary<string, Drawable> drawables = new();
 
-        private AnimationScene container;
+        private AnimationScene animationScene;
         public InterpreterContext(AnimationScene container)
         {
-            this.container = container;
+            animationScene = container;
         }
 
         const int duration = 500;
@@ -83,26 +82,23 @@ public partial class AnimationScene : Container
 
             base.OnObjectAdded(name, obj);
             drawables.Add(name, drawable);
-            container.Add(drawable);
+            animationScene.Add(drawable);
 
             drawable.FlashColour(Color4.Pink, 800, Easing.OutQuint)
-                .OnComplete(_ => container.MoveNextCommand());
+                .OnComplete(_ => animationScene.MoveNextCommand());
         }
 
         protected override void OnObjectErasingOut(string name, AnimationObject obj)
         {
             if (drawables.TryGetValue(name, out var drawable))
             {
-                var delay = drawable.Transforms.Select(t => t.EndTime - drawable.Time.Current)
-                    .OrderDescending()
-                    .FirstOrDefault();
-
-                drawable.Delay(delay).Then().FadeOut(duration).Expire()
+                drawable.FadeOut(duration)
+                    .Expire()
                     .OnComplete(_ =>
                     {
                         drawables.Remove(name);
                         base.OnObjectErasingOut(name, obj);
-                        container.MoveNextCommand();
+                        animationScene.MoveNextCommand();
                     });
             }
         }
@@ -111,17 +107,11 @@ public partial class AnimationScene : Container
         {
             if (drawables.TryGetValue(name, out var drawable))
             {
-                var delay = drawable.Transforms.Select(t => t.EndTime - drawable.Time.Current)
-                    .OrderDescending()
-                    .FirstOrDefault();
-
-                drawable.Delay(delay)
-                    .Then()
-                    .MoveTo(new Vector2(position.X, position.Y), duration)
+                drawable.MoveTo(new Vector2(position.X, position.Y), duration)
                     .OnComplete(_ =>
                     {
                         base.OnObjectPlaced(name, obj, position);
-                        container.MoveNextCommand();
+                        animationScene.MoveNextCommand();
                     });
             }
         }
@@ -129,27 +119,20 @@ public partial class AnimationScene : Container
         protected override void OnObjectShifting(string name, AnimationObject obj, Core.Direction direction)
         {
             base.OnObjectShifting(name, obj, direction);
-            var rect = container.DrawRectangle;
+            var rect = animationScene.DrawRectangle;
 
             if (drawables.TryGetValue(name, out var drawable))
             {
-                var delay = drawable.Transforms.Select(t => t.EndTime - drawable.Time.Current)
-                    .OrderDescending()
-                    .FirstOrDefault();
-
-                var transfrom = drawable.Delay(delay)
-                    .Then();
-
-                transfrom = direction switch
+                var transfrom = direction switch
                 {
-                    Core.Direction.Left => transfrom.MoveToX(-container.DrawWidth / 2, duration),
-                    Core.Direction.Right => transfrom.MoveToX(container.DrawWidth / 2, duration),
-                    Core.Direction.Up => transfrom.MoveToY(-container.DrawHeight / 2, duration),
-                    Core.Direction.Down => transfrom.MoveToY(container.DrawHeight / 2, duration),
+                    Core.Direction.Left => drawable.MoveToX(-animationScene.DrawWidth / 2, duration),
+                    Core.Direction.Right => drawable.MoveToX(animationScene.DrawWidth / 2, duration),
+                    Core.Direction.Up => drawable.MoveToY(-animationScene.DrawHeight / 2, duration),
+                    Core.Direction.Down => drawable.MoveToY(animationScene.DrawHeight / 2, duration),
                     _ => throw new ArgumentException($"Giving direction is not valid: {direction}"),
                 };
 
-                transfrom.OnComplete(_ => container.MoveNextCommand());
+                transfrom.OnComplete(_ => animationScene.MoveNextCommand());
             }
         }
     }
