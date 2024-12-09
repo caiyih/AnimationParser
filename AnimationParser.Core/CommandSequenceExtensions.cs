@@ -77,6 +77,9 @@ public static class CommandSequenceExtensions
                         loopFrames.Push(new CountedLoopFrame(loopCommand));
                         break;
 
+                    case LoopCommand:
+                        break;
+
                     // Prevent null commands
                     case IAnimationCommand animationCommand:
                         yield return animationCommand;
