@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Numerics;
 using AnimationParser.Core;
+using AnimationParser.Core.Commands;
 using AnimationParser.Core.Shapes;
 using DanmakuEngine.DearImgui.Windowing;
 using DanmakuEngine.Timing;
@@ -19,38 +21,28 @@ public class AnimationWindow : ImguiWindowBase
             this.window = window;
         }
 
-        private List<IEnumerable<bool>> Coroutines = new List<IEnumerable<bool>>();
+        private void SetCurrentCoroutine(IEnumerable<bool> coroutine)
+        {
+            CoroutineEnumerator = coroutine.GetEnumerator();
+        }
 
-        private IEnumerator<IEnumerable<bool>>? CoroutineEnumerator;
-        private IEnumerator<bool>? CurrentCoroutine;
+        private IEnumerator<bool>? CoroutineEnumerator;
         public bool MoveNext()
         {
-            if (CoroutineEnumerator == null)
-            {
-                CoroutineEnumerator = Coroutines.GetEnumerator();
-                CoroutineEnumerator.MoveNext();
-                CurrentCoroutine = CoroutineEnumerator.Current.GetEnumerator();
-            }
-
-            if (CurrentCoroutine!.MoveNext())
-            {
-                return true;
-            }
-            else
+            if (CoroutineEnumerator is not null)
             {
                 if (CoroutineEnumerator.MoveNext())
                 {
-                    CurrentCoroutine = CoroutineEnumerator.Current.GetEnumerator();
                     return true;
                 }
                 else
                 {
-                    CoroutineEnumerator = null;
-                    return false;
+                    window.MoveNextCommand();
                 }
             }
-        }
 
+            return false;
+        }
 
         private Dictionary<string, ObjectInfo> objectsInfo = new Dictionary<string, ObjectInfo>();
 
@@ -68,13 +60,13 @@ public class AnimationWindow : ImguiWindowBase
 
         protected override void OnObjectAdded(string name, AnimationObject drawable)
         {
-            objectsInfo.Add(name, new ObjectInfo());
-            base.OnObjectAdded(name, drawable);
-
-            Coroutines.Add(FadeIn());
+            SetCurrentCoroutine(FadeIn());
 
             IEnumerable<bool> FadeIn()
             {
+                objectsInfo.Add(name, new ObjectInfo());
+                base.OnObjectAdded(name, drawable);
+
                 var info = objectsInfo[name];
                 var start = Time.ElapsedSeconds;
 
@@ -90,7 +82,7 @@ public class AnimationWindow : ImguiWindowBase
 
         protected override void OnObjectErasingOut(string name, AnimationObject drawable)
         {
-            Coroutines.Add(FadeOut());
+            SetCurrentCoroutine(FadeOut());
 
             IEnumerable<bool> FadeOut()
             {
@@ -102,12 +94,14 @@ public class AnimationWindow : ImguiWindowBase
                     info.Alpha = 1 - (float)(Time.ElapsedSeconds - start) / duration;
                     yield return true;
                 }
+
+                base.OnObjectErasingOut(name, drawable);
             }
         }
 
         protected override void OnObjectPlaced(string name, AnimationObject obj, Vector2 position)
         {
-            Coroutines.Add(PlaceObject());
+            SetCurrentCoroutine(PlaceObject());
 
             IEnumerable<bool> PlaceObject()
             {
@@ -120,13 +114,13 @@ public class AnimationWindow : ImguiWindowBase
                     yield return true;
                 }
 
-                obj.Position = position;
+                base.OnObjectPlaced(name, obj, position);
             }
         }
 
         protected override void OnObjectShifting(string name, AnimationObject drawable, Direction direction)
         {
-            Coroutines.Add(ShiftObject());
+            SetCurrentCoroutine(ShiftObject());
 
             IEnumerable<bool> ShiftObject()
             {
@@ -150,7 +144,7 @@ public class AnimationWindow : ImguiWindowBase
                     yield return true;
                 }
 
-                drawable.Position = destination;
+                base.OnObjectShifting(name, drawable, direction);
             }
         }
     }
@@ -158,6 +152,17 @@ public class AnimationWindow : ImguiWindowBase
     public AnimationWindow()
         : base("Animation Demo Window")
     {
+    }
+
+    private IEnumerator<IAnimationCommand>? commandEnumerator;
+    private void MoveNextCommand()
+    {
+        Debug.Assert(commandEnumerator is not null);
+
+        if (commandEnumerator.MoveNext())
+        {
+            commandEnumerator.Current.Execute(context);
+        }
     }
 
     const string defaultCode = """
@@ -168,7 +173,6 @@ public class AnimationWindow : ImguiWindowBase
                                """;
 
     private string codeBuffer = defaultCode;
-    private bool finished = false;
     private string? errorMessage = null;
     protected override void Update()
     {
@@ -184,13 +188,10 @@ public class AnimationWindow : ImguiWindowBase
 
                 context = new ImGuiAnimationContext(this);
 
-                foreach (var statement in parser.Parse().Flatten())
-                {
-                    statement.Execute(context);
-                }
+                commandEnumerator = parser.Parse().Flatten().GetEnumerator();
+                MoveNextCommand();
 
                 errorMessage = null;
-                finished = false;
             }
             catch (Exception e)
             {
@@ -203,9 +204,9 @@ public class AnimationWindow : ImguiWindowBase
             ImGui.TextColored(new Vector4(1, 0, 0, 1), errorMessage);
         }
 
-        if (context != null && !finished)
+        if (context != null)
         {
-            finished = !context.MoveNext();
+            context.MoveNext();
 
             var drawList = ImGui.GetWindowDrawList();
             var windowPos = ImGui.GetWindowPos();
