@@ -34,18 +34,16 @@ public static class CommandSequenceExtensions
         {
         }
 
-        public override bool IsFinished => !FirstIteration;
-        private bool FirstIteration { get; set; } = true;
-        public override bool OnIterationEnd()
-            => FirstIteration = false;
+        public override bool IsFinished => false;
+        public override bool OnIterationEnd() => false;
     }
 
     private class CountedLoopFrame : LoopFrame
     {
-        public CountedLoopFrame(int count, IEnumerable<IAnimationCommand> commandSequence)
-            : base(commandSequence)
+        public CountedLoopFrame(LoopCommand loopCommand)
+            : base(loopCommand.Commands)
         {
-            RemainingIterations = count;
+            RemainingIterations = loopCommand.Count;
         }
 
         public override bool IsFinished => RemainingIterations <= 0;
@@ -69,19 +67,14 @@ public static class CommandSequenceExtensions
         while (loopFrames.TryPeek(out var currentFrame))
         {
             Debug.Assert(currentFrame != null);
-
-            if (currentFrame.IsFinished)
-            {
-                loopFrames.Pop();
-                continue;
-            }
+            Debug.Assert(currentFrame is InitialFrame || !currentFrame.IsFinished);
 
             if (currentFrame.SequenceEnumerator.MoveNext())
             {
                 switch (currentFrame.SequenceEnumerator.Current)
                 {
-                    case LoopCommand loopCommand:
-                        loopFrames.Push(new CountedLoopFrame(loopCommand.Count, loopCommand.Commands));
+                    case LoopCommand loopCommand when loopCommand.Count > 0:
+                        loopFrames.Push(new CountedLoopFrame(loopCommand));
                         break;
 
                     case IAnimationCommand animationCommand:
@@ -98,6 +91,10 @@ public static class CommandSequenceExtensions
                 {
                     // Reset the enumerator to start the next iteration
                     currentFrame.SequenceEnumerator.Reset();
+                }
+                else
+                {
+                    loopFrames.Pop();
                 }
             }
         }
