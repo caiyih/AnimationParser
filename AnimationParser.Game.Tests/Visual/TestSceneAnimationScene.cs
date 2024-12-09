@@ -84,11 +84,12 @@ namespace AnimationParser.Game.Tests.Visual
                 Size = new(500, 500),
             });
             Add(codeTextBox = new CodeTextBox());
+        }
 
-            AddStep("clear", () =>
-            {
-                scene.Clear();
-            });
+        [Test]
+        public void TestInterpretCode()
+        {
+            AddStep("clear", () =>scene.Clear());
 
             AddStep("begin animation", () =>
             {
