@@ -60,6 +60,10 @@ public class Lexer
                     {
                         yield return ReadNumber();
                     }
+                    else if (CurrentChar == '-')
+                    {
+                        yield return ReadTokenStartWithMinus();
+                    }
                     else
                     {
                         throw new Exception($"Invalid character '{CurrentChar}' at line {tokenFactory.CurrentPosition.LineNo}:{tokenFactory.CurrentPosition.CharNo}");
@@ -69,6 +73,26 @@ public class Lexer
         }
 
         yield return tokenFactory.EndOfSource;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    private Token ReadTokenStartWithMinus()
+    {
+        MoveNext();
+
+        if (char.IsDigit(CurrentChar))
+        {
+            var numberToken =  ReadNumber();
+
+            numberToken.SourceIndex--; // Move back to include the minus sign
+            numberToken.Length++; // Include the minus sign in the length
+
+            return numberToken;
+        }
+        else
+        {
+            throw new Exception($"Invalid character '{CurrentChar}' at line {tokenFactory.CurrentPosition.LineNo}:{tokenFactory.CurrentPosition.CharNo}");
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
@@ -91,7 +115,7 @@ public class Lexer
     private Token ReadNumber()
     {
         int start = CurrentSourceIndex;
-        while (char.IsDigit(CurrentChar))
+        while (char.IsDigit(CurrentChar) || CurrentChar == '.')
             MoveNext();
 
         return tokenFactory.Number(CurrentSourceIndex - start);
