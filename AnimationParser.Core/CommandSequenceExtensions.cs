@@ -77,12 +77,32 @@ public static class CommandSequenceExtensions
                         loopFrames.Push(new CountedLoopFrame(loopCommand));
                         break;
 
+                    // Prevent null commands
                     case IAnimationCommand animationCommand:
                         yield return animationCommand;
                         break;
 
                     default:
-                        throw new InvalidOperationException("Should never happen.");
+                        // The switch statement generates IL as below
+                        // IAnimationCommand animationCommand = currentFrame.SequenceEnumerator.Current;
+                        // LoopCommand loopCommand = animationCommand as LoopCommand;
+                        // if (loopCommand is not null)
+                        // {
+                        //     if (loopCommand.Count > 0)
+                        //         ...
+                        // }
+                        // else
+                        // {
+                        //     if (animationCommand is not null)
+                        //     {
+                        //          yield return animation command;
+                        //     }
+                        //     else
+                        //     {
+                        //          throw new InvalidOperationException("Command can NOT be null!");
+                        //     }
+                        // }
+                        throw new InvalidOperationException("Command can NOT be null!");
                 }
             }
             else
