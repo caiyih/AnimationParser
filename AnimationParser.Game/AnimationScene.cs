@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using osuTK;
 using AnimationParser.Core;
@@ -9,6 +11,7 @@ using System.Linq;
 using osuTK.Graphics;
 using AnimationParser.Core.Shapes;
 using AnimationParser.Core.Commands;
+using System.Diagnostics;
 
 namespace AnimationParser.Game;
 
@@ -20,8 +23,8 @@ public partial class AnimationScene : Container
         // In this case, osu!framework. But can be easily to adapt to other engines if you implement this context
         private Dictionary<string, Drawable> drawables = new();
 
-        private Container container;
-        public InterpreterContext(Container container)
+        private AnimationScene container;
+        public InterpreterContext(AnimationScene container)
         {
             this.container = container;
         }
@@ -30,8 +33,6 @@ public partial class AnimationScene : Container
 
         protected override void OnObjectAdded(string name, AnimationObject obj)
         {
-            base.OnObjectAdded(name, obj);
-
             // Add a associated binding GameObject to the Game Engine
             var drawable = new Container()
             {
@@ -80,10 +81,12 @@ public partial class AnimationScene : Container
                 }
             }
 
+            base.OnObjectAdded(name, obj);
             drawables.Add(name, drawable);
             container.Add(drawable);
 
-            drawable.FlashColour(Color4.Pink, 800, Easing.OutQuint);
+            drawable.FlashColour(Color4.Pink, 800, Easing.OutQuint)
+                .OnComplete(_ => container.MoveNextCommand());
         }
 
         protected override void OnObjectErasingOut(string name, AnimationObject obj)
@@ -99,21 +102,27 @@ public partial class AnimationScene : Container
                     {
                         drawables.Remove(name);
                         base.OnObjectErasingOut(name, obj);
+                        container.MoveNextCommand();
                     });
             }
         }
 
         protected override void OnObjectPlaced(string name, AnimationObject obj, System.Numerics.Vector2 position)
         {
-            base.OnObjectPlaced(name, obj, position);
-
             if (drawables.TryGetValue(name, out var drawable))
             {
                 var delay = drawable.Transforms.Select(t => t.EndTime - drawable.Time.Current)
                     .OrderDescending()
                     .FirstOrDefault();
 
-                drawable.Delay(delay).Then().MoveTo(new Vector2(position.X, position.Y), duration);
+                drawable.Delay(delay)
+                    .Then()
+                    .MoveTo(new Vector2(position.X, position.Y), duration)
+                    .OnComplete(_ =>
+                    {
+                        base.OnObjectPlaced(name, obj, position);
+                        container.MoveNextCommand();
+                    });
             }
         }
 
@@ -128,21 +137,19 @@ public partial class AnimationScene : Container
                     .OrderDescending()
                     .FirstOrDefault();
 
-                switch (direction)
+                var transfrom = drawable.Delay(delay)
+                    .Then();
+
+                transfrom = direction switch
                 {
-                    case Core.Direction.Up:
-                        drawable.Delay(delay).Then().MoveToY(-container.DrawHeight / 2, duration);
-                        break;
-                    case Core.Direction.Down:
-                        drawable.Delay(delay).Then().MoveToY(container.DrawHeight / 2, duration);
-                        break;
-                    case Core.Direction.Left:
-                        drawable.Delay(delay).Then().MoveToX(-container.DrawWidth / 2, duration);
-                        break;
-                    case Core.Direction.Right:
-                        drawable.Delay(delay).Then().MoveToX(container.DrawWidth / 2, duration);
-                        break;
-                }
+                    Core.Direction.Left => transfrom.MoveToX(-container.DrawWidth / 2, duration),
+                    Core.Direction.Right => transfrom.MoveToX(container.DrawWidth / 2, duration),
+                    Core.Direction.Up => transfrom.MoveToY(-container.DrawHeight / 2, duration),
+                    Core.Direction.Down => transfrom.MoveToY(container.DrawHeight / 2, duration),
+                    _ => throw new ArgumentException($"Giving direction is not valid: {direction}"),
+                };
+
+                transfrom.OnComplete(_ => container.MoveNextCommand());
             }
         }
     }
@@ -161,13 +168,23 @@ public partial class AnimationScene : Container
         context = new InterpreterContext(this);
     }
 
+    private IEnumerator<IAnimationCommand>? commandEnumerator;
+    private void MoveNextCommand()
+    {
+        Debug.Assert(commandEnumerator is not null);
+
+        if (commandEnumerator.MoveNext())
+        {
+            commandEnumerator.Current.Execute(context);
+        }
+    }
+
     public void ExecuteAnimationCommands(IEnumerable<IAnimationCommand> commands)
     {
         Clear();
 
-        foreach (var command in commands.Flatten())
-        {
-            command.Execute(context);
-        }
+        // Flatten the commands to avoid executing whole loops at once.
+        commandEnumerator = commands.Flatten().GetEnumerator();
+        MoveNextCommand();
     }
 }
