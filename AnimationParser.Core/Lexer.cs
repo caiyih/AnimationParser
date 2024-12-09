@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using System.Collections.Immutable;
 using AnimationParser.Core.Tokens;
 
 namespace AnimationParser.Core;
