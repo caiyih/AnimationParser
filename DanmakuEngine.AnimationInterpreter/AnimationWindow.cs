@@ -37,7 +37,7 @@ public class AnimationWindow : ImguiWindowBase
                 }
                 else
                 {
-                    window.MoveNextCommand();
+                    return window.MoveNextCommand();
                 }
             }
 
@@ -155,14 +155,17 @@ public class AnimationWindow : ImguiWindowBase
     }
 
     private IEnumerator<IAnimationCommand>? commandEnumerator;
-    private void MoveNextCommand()
+    private bool MoveNextCommand()
     {
         Debug.Assert(commandEnumerator is not null);
 
         if (commandEnumerator.MoveNext())
         {
             commandEnumerator.Current.Execute(context);
+            return true;
         }
+
+        return false;
     }
 
     const string defaultCode = """
