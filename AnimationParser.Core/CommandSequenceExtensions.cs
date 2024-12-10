@@ -155,7 +155,7 @@ public static class CommandSequenceExtensions
     /// </summary>
     /// <param name="tokenStream">The tokenized source code.</param>
     /// <param name="context">The context to execute the commands.</param>
-    public static async void InterprettedlyExecuteAllAsync(this IEnumerable<Token> tokenStream, AnimationContext? context = null)
+    public static async Task InterprettedlyExecuteAllAsync(this IEnumerable<Token> tokenStream, AnimationContext? context = null)
     {
         context ??= new AnimationContext();
 
