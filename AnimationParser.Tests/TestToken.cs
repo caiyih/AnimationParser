@@ -50,4 +50,50 @@ public class TestToken()
 
         Assert.That(lhs.GetHashCode(), Is.EqualTo(rhs.GetHashCode()));
     }
+
+    [Test]
+    public void TestToken_EqualsIfSameTextAndType()
+    {
+        rhsFactory.MoveNext();
+        rhsFactory.OnNewLine(); // different position and source index
+
+        var lhs = lhsFactory.Identifier("foo");
+        var rhs = rhsFactory.Identifier("foo");
+
+        Assert.That(lhs, Is.EqualTo(rhs));
+    }
+
+    [Test]
+    public void TestToken_NotEqualsIfDifferentText()
+    {
+        var lhs = lhsFactory.Identifier("foo");
+        var rhs = rhsFactory.Identifier("bar");
+
+        Assert.That(lhs, Is.Not.EqualTo(rhs));
+    }
+
+    [Test]
+    public void TestToken_NotEqualsIfDifferentType()
+    {
+        var lhs = lhsFactory.Identifier("foo");
+        var rhs = rhsFactory.Keyword("foo");
+
+        Assert.That(lhs, Is.Not.EqualTo(rhs));
+    }
+
+    [Test]
+    public void TestToken_NotEqualsForNull()
+    {
+        var lhs = lhsFactory.Identifier("foo");
+
+        Assert.That(lhs.Equals(null), Is.False);
+    }
+
+    [Test]
+    public void TestToken_NotEqualsForOtherType()
+    {
+        var lhs = lhsFactory.Identifier("foo");
+
+        Assert.That(lhs.Equals(new object()), Is.False);
+    }
 }
