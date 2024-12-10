@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 
 namespace AnimationParser.Core.Tokens;
 
@@ -30,11 +31,7 @@ public struct Token
     };
 
     public override readonly int GetHashCode()
-        => HashCode.Combine(Type,
-            sourceDocument.GetHashCode(), // Hash code of large object is cached in its sync block index
-            Position,
-            SourceIndex,
-            Length);
+        => HashCode.Combine(Type, CultureInfo.InvariantCulture.CompareInfo.GetHashCode(Text, CompareOptions.None));
 
     public override bool Equals(object? obj)
     {
