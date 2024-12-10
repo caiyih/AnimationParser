@@ -45,4 +45,14 @@ public class TestPlaceCommand
             }
         }
     }
+
+    [Test]
+    public void TestPlaceCommand_ThrowIfObjectNotExist()
+    {
+        const string code = "(place drawable (10 10))";
+
+        var lexer = new Lexer(code);
+
+        Assert.Throws<Exception>(() => lexer.Tokenize().InterprettedlyExecuteAll());
+    }
 }

@@ -43,4 +43,14 @@ public class TestShiftCommand
             }
         }
     }
+
+    [Test]
+    public void TestShiftCommand_ThrowIfObjectNotExist()
+    {
+        const string code = "(shift drawable up)";
+
+        var lexer = new Lexer(code);
+
+        Assert.Throws<Exception>(() => lexer.Tokenize().InterprettedlyExecuteAll());
+    }
 }

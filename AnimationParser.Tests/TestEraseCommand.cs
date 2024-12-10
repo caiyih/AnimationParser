@@ -46,4 +46,14 @@ public class TestEraseCommand
             }
         }
     }
+
+    [Test]
+    public void TestEraseCommand_ThrowIfObjectNotExist()
+    {
+        const string code = "(erase drawable)";
+
+        var lexer = new Lexer(code);
+
+        Assert.Throws<Exception>(() => lexer.Tokenize().InterprettedlyExecuteAll());
+    }
 }
