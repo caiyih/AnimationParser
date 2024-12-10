@@ -14,7 +14,7 @@ public partial class AnimationContext
     {
         ArgumentNullException.ThrowIfNull(name, nameof(name));
 
-        if (_animatedObject.ContainsKey(name))
+        if (AnimatedObjects.ContainsKey(name))
         {
             throw new Exception($"Variable '{name}' is already declared");
         }
@@ -24,12 +24,12 @@ public partial class AnimationContext
 
     public AnimationObject? GetObject(string name)
     {
-        return _animatedObject.TryGetValue(name, out var value) ? value : default;
+        return AnimatedObjects.TryGetValue(name, out var value) ? value : default;
     }
 
     public void ShiftObject(string name, Direction direction)
     {
-        if (!_animatedObject.TryGetValue(name, out var obj))
+        if (!AnimatedObjects.TryGetValue(name, out var obj))
         {
             throw new Exception($"Variable '{name}' is not declared");
         }
@@ -39,7 +39,7 @@ public partial class AnimationContext
 
     public void PlaceObject(string name, Vector2 position)
     {
-        if (!_animatedObject.TryGetValue(name, out var obj))
+        if (!AnimatedObjects.TryGetValue(name, out var obj))
         {
             throw new Exception($"Variable '{name}' is not declared");
         }
@@ -51,7 +51,7 @@ public partial class AnimationContext
 
     public void EraseObject(string name)
     {
-        if (!_animatedObject.TryGetValue(name, out var obj))
+        if (!AnimatedObjects.TryGetValue(name, out var obj))
         {
             throw new Exception($"Variable '{name}' is not declared");
         }
