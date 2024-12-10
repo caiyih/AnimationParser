@@ -45,4 +45,18 @@ public class TestCommandSequenceFlatten
 
         Assert.That(flattened.Count(), Is.EqualTo(10000 + 1));
     }
+
+    [Test]
+    public void TestFlatten_LoopWithInvalidCountSkipped()
+    {
+        const string input = """
+                             (loop 0 ( (loop 100 ( (shift drawable up) ) ) ) )
+                             """;
+
+        var lexer = new Lexer(input);
+        var parser = new Parser(lexer.Tokenize());
+        var flattened = parser.Parse().Flatten();
+
+        Assert.That(flattened.Count(), Is.EqualTo(0));
+    }
 }
