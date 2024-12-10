@@ -117,4 +117,55 @@ public class TestLexer
 
         VerifyTokenStream(tokens, expected);
     }
+
+    [Test]
+    public void TestLexer_NumberWithDecimalDot()
+    {
+        const string input = @"(42.0 3.14)";
+        Token[] expected = [
+            tokenFactory.LeftParen,
+                tokenFactory.Number("42.0"),
+                tokenFactory.Number("3.14"),
+            tokenFactory.RightParen,
+            tokenFactory.EndOfSource,
+        ];
+
+        var lexer = new Lexer(input);
+        var tokens = lexer.Tokenize();
+
+        VerifyTokenStream(tokens, expected);
+    }
+
+    [Test]
+    public void TestLexer_NumberWithNegativeSign()
+    {
+        const string input = @"(-42 -3.14)";
+        Token[] expected = [
+            tokenFactory.LeftParen,
+                tokenFactory.Number("-42"),
+                tokenFactory.Number("-3.14"),
+            tokenFactory.RightParen,
+            tokenFactory.EndOfSource,
+        ];
+
+        var lexer = new Lexer(input);
+        var tokens = lexer.Tokenize();
+
+        VerifyTokenStream(tokens, expected);
+    }
+
+    [Test]
+    public void TestLexer_IdentifierWithNumber()
+    {
+        const string input = "object1";
+        Token[] expected = [
+            tokenFactory.Identifier("object1"),
+            tokenFactory.EndOfSource,
+        ];
+
+        var lexer = new Lexer(input);
+        var tokens = lexer.Tokenize();
+
+        VerifyTokenStream(tokens, expected);
+    }
 }

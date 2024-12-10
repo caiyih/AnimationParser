@@ -453,4 +453,60 @@ public class TestParser
             Assert.That(shift.Direction, Is.EqualTo(Direction.Up));
         });
     }
+
+    [Test]
+    public void TestParseNumberWithDecimalPoint()
+    {
+        const string code = "42.0";
+
+        var lexer = new Lexer(code);
+        var parser = new Parser(lexer.Tokenize());
+
+        Assert.That(parser.VisitNumber(), Is.EqualTo(42.0));
+    }
+
+    [Test]
+    public void TestParseNumberWithNegativeSign()
+    {
+        const string code = "-42";
+
+        var lexer = new Lexer(code);
+        var parser = new Parser(lexer.Tokenize());
+
+        Assert.That(parser.VisitNumber(), Is.EqualTo(-42));
+    }
+
+    [Test]
+    public void TestIdentifierWithNumber()
+    {
+        const string code = "(define object1 ((circle (0 0) 1)))";
+
+        var lexer = new Lexer(code);
+        var parser = new Parser(lexer.Tokenize());
+
+        var command = parser.Parse().Flatten().Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(command, Is.InstanceOf<DefineCommand>());
+            Assert.That(((DefineCommand)command).ObjectName, Is.EqualTo("object1"));
+        });
+    }
+
+    [Test]
+    public void TestIdentifierWithUnderline()
+    {
+        const string code = "(define object_1 ((circle (0 0) 1)))";
+
+        var lexer = new Lexer(code);
+        var parser = new Parser(lexer.Tokenize());
+
+        var command = parser.Parse().Flatten().Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(command, Is.InstanceOf<DefineCommand>());
+            Assert.That(((DefineCommand)command).ObjectName, Is.EqualTo("object_1"));
+        });
+    }
 }
