@@ -44,4 +44,31 @@ public class TestDefineCommand
             }
         }
     }
+
+    [Test]
+    public void TestDefineCommand_ThrowIfDefineDuplicate()
+    {
+        const string code = """
+                            (define drawable ((line (0 0) (50 50))))
+                            (define drawable ((line (0 0) (50 50))))
+                            """;
+
+        var lexer = new Lexer(code);
+
+        Assert.Throws<Exception>(() => lexer.Tokenize().InterprettedlyExecuteAll());
+    }
+
+    [Test]
+    public void TestDefineCommand_NotThrowIfEraseBeforeDuplicate()
+    {
+        const string code = """
+                            (define drawable ((line (0 0) (50 50))))
+                            (erase drawable)
+                            (define drawable ((line (0 0) (50 50))))
+                            """;
+
+        var lexer = new Lexer(code);
+
+        Assert.DoesNotThrow(() => lexer.Tokenize().InterprettedlyExecuteAll());
+    }
 }
